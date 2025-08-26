@@ -1,4 +1,4 @@
-module github.com/itering/go-workers
+module github.com/EstateXOfficial/go-workers
 
 go 1.15
 
