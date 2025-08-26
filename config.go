@@ -1,6 +1,7 @@
 package workers
 
 import (
+	"crypto/tls"
 	"strconv"
 	"time"
 
@@ -50,10 +51,17 @@ func Configure(options map[string]string) {
 			MaxIdle:     poolSize,
 			IdleTimeout: 240 * time.Second,
 			Dial: func() (redis.Conn, error) {
-				c, err := redis.Dial("tcp", options["server"])
+				c, err := redis.Dial("tcp",
+					options["server"],
+					redis.DialUseTLS(options["tls"] == "true"),
+					redis.DialTLSConfig(&tls.Config{
+						InsecureSkipVerify: true,
+					}),
+				)
 				if err != nil {
 					return nil, err
 				}
+
 				if options["password"] != "" {
 					if _, err := c.Do("AUTH", options["password"]); err != nil {
 						c.Close()
